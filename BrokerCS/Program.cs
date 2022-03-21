@@ -18,7 +18,7 @@ namespace BrokerCS {
       var valueToSell = double.Parse(args[ValueToSellParams]);
       var valueToBuy = double.Parse(args[ValueToBuyParams]);
       var toEmail = config.ToEmail;
-      var stockClient = ConfigStockClient(args, config);
+      var stockClient = ConfigStockClient(stockName, config);
       var emailClient = ConfigEmailClient(config);
       
       var broker = new Broker(stockName, valueToSell, valueToBuy, toEmail, stockClient, emailClient);
@@ -39,8 +39,7 @@ namespace BrokerCS {
 
       return config;
     }
-    private static IStockClient ConfigStockClient(string[] args, Config config) {
-      var stockName = args[StockNameParams];
+    private static IStockClient ConfigStockClient(string stockName, Config config) {
       var stockClient = new StockClientByHGBrasil(stockName, config.HGbrasilKey);
       //var stockClient = new StockClientTest(stockName);
       return stockClient;

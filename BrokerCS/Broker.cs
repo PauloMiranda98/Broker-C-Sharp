@@ -20,9 +20,10 @@ namespace BrokerCS {
       this.stockName = stockName;
       this.valueToSell = valueToSell;
       this.valueToBuy = valueToBuy;
+      this.toEmail = toEmail;
+
       this.stockClient = stockClient;
       this.emailClient = emailClient;
-      this.toEmail = toEmail;
     }
 
     public void Start() {

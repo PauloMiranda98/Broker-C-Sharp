@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
 using BrokerCS.model.hgbrasil;
-using BrokerCS.services;
 using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 
-namespace BrokerCS {
+namespace BrokerCS.services {
   public class StockClientByHGBrasil : IStockClient {
     private string stockName;
     private string hgbrasilKey;
