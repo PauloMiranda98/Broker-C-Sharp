@@ -3,6 +3,11 @@ using BrokerCS.services;
 
 namespace BrokerCS {
   public class Broker {
+    private const int DefaultEmailType = -1;
+    private const int BuyEmailType = 0;
+    private const int SellEmailType = 1;
+    private const int DelayTimeInMs = 10000;
+    
     private string toEmail;
     private string stockName;
     private double valueToSell;
@@ -23,26 +28,26 @@ namespace BrokerCS {
     public void Start() {
       while (true) {
         VerifyStockQuote();
-        Thread.Sleep(10000);
+        Thread.Sleep(DelayTimeInMs);
       }
     }
     async void VerifyStockQuote() {
       double stockCurrentValue = await stockClient.GetCurrentValue();
 
       if (ShouldBuy(stockCurrentValue)) {
-        if (lastEmailType != 0) {
+        if (lastEmailType != BuyEmailType) {
           SendEmailToBuy();
-          lastEmailType = 0;
+          lastEmailType = BuyEmailType;
         }
       }
       else if (ShouldSell(stockCurrentValue)) {
-        if (lastEmailType != 1) {
+        if (lastEmailType != SellEmailType) {
           SendEmailToSell();
-          lastEmailType = 1;
+          lastEmailType = SellEmailType;
         }
       }
       else {
-        lastEmailType = -1;
+        lastEmailType = DefaultEmailType;
       }
     }
 

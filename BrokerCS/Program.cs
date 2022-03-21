@@ -5,16 +5,20 @@ using SharpYaml.Serialization;
 
 namespace BrokerCS {
   internal class Program {
+    private const int StockNameParams = 0;
+    private const int ValueToSellParams = 1;
+    private const int ValueToBuyParams = 2;
+      
     public static void Main(string[] args) {
       ValidParams(args);
 
       var config = GetConfig();
 
-      var stockName = args[0];
-      var valueToSell = double.Parse(args[1]);
-      var valueToBuy = double.Parse(args[2]);
+      var stockName = args[StockNameParams];
+      var valueToSell = double.Parse(args[ValueToSellParams]);
+      var valueToBuy = double.Parse(args[ValueToBuyParams]);
       var toEmail = config.ToEmail;
-      var stockClient = ConfigStockWatcher(args, config);
+      var stockClient = ConfigStockClient(args, config);
       var emailClient = ConfigEmailClient(config);
       
       var broker = new Broker(stockName, valueToSell, valueToBuy, toEmail, stockClient, emailClient);
@@ -35,8 +39,8 @@ namespace BrokerCS {
 
       return config;
     }
-    private static IStockClient ConfigStockWatcher(string[] args, Config config) {
-      var stockName = args[0];
+    private static IStockClient ConfigStockClient(string[] args, Config config) {
+      var stockName = args[StockNameParams];
       var stockClient = new StockClientByHGBrasil(stockName, config.HGbrasilKey);
       //var stockClient = new StockClientTest(stockName);
       return stockClient;
