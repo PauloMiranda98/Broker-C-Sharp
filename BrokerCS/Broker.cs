@@ -31,8 +31,8 @@ namespace BrokerCS {
         Thread.Sleep(DelayTimeInMs);
       }
     }
-    async void VerifyStockQuote() {
-      double stockCurrentValue = await stockClient.GetCurrentValue();
+    private async void VerifyStockQuote() {
+      var stockCurrentValue = await stockClient.GetCurrentValue();
 
       if (ShouldBuy(stockCurrentValue)) {
         if (lastEmailType != BuyEmailType) {
@@ -59,18 +59,18 @@ namespace BrokerCS {
       return stockCurrentValue > valueToSell;
     }
 
-    void SendEmailToBuy() {
-      string title = "Compre ações do ativo " + stockName;
-      string text = "O valor da ação " + stockName + " ficou abaixo de " + valueToBuy +
-                    ". Aproveite essa oportunidade para comprar!";
+    private void SendEmailToBuy() {
+      var title = "Compre ações do ativo " + stockName;
+      var text = "O valor da ação " + stockName + " ficou abaixo de " + valueToBuy +
+                 ". Aproveite essa oportunidade para comprar!";
 
       emailClient.SendEmail(title, text, toEmail);
     }
 
-    void SendEmailToSell() {
-      string title = "Venda ações do ativo " + stockName;
-      string text = "O valor da ação " + stockName + " ficou acima de " + valueToSell +
-                    ". Aproveite essa oportunidade para vender!";
+    private void SendEmailToSell() {
+      var title = "Venda ações do ativo " + stockName;
+      var text = "O valor da ação " + stockName + " ficou acima de " + valueToSell +
+                 ". Aproveite essa oportunidade para vender!";
 
       emailClient.SendEmail(title, text, toEmail);
     }
