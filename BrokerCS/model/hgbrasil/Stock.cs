@@ -54,7 +54,7 @@ namespace BrokerCS.model.hgbrasil {
     public string UpdatedAt { get; set; }
   }
   
-  public class Asset {
+  public class Stock {
     [JsonProperty("by")]
     public string By { get; set; }
   

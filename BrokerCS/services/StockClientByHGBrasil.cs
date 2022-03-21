@@ -8,13 +8,12 @@ using Microsoft.AspNetCore.WebUtilities;
 using Newtonsoft.Json;
 
 namespace BrokerCS {
-  public class AssetClientByHGBrasil : IAssetClient {
-    private string assetName { get; set; }
-
+  public class StockClientByHGBrasil : IStockClient {
+    private string stockName;
     private string hgbrasilKey;
 
-    public AssetClientByHGBrasil(string assetName, string hgbrasilKey) {
-      this.assetName = assetName;
+    public StockClientByHGBrasil(string stockName, string hgbrasilKey) {
+      this.stockName = stockName;
       this.hgbrasilKey = hgbrasilKey;
     }
 
@@ -22,7 +21,7 @@ namespace BrokerCS {
       var client = new HttpClient();
       var query = new Dictionary<string, string>(){
         ["key"] = hgbrasilKey,
-        ["symbol"] = assetName
+        ["symbol"] = stockName
       };
 
       var uri = QueryHelpers.AddQueryString("https://api.hgbrasil.com/finance/stock_price", query);
@@ -30,10 +29,10 @@ namespace BrokerCS {
       
       httpResponse.EnsureSuccessStatusCode(); // throws if not 200-299
       String jsonResponse = await httpResponse.Content.ReadAsStringAsync();
-      Asset asset = JsonConvert.DeserializeObject<Asset>(jsonResponse);
-      double price = asset.Results[assetName].Price;
+      Stock stock = JsonConvert.DeserializeObject<Stock>(jsonResponse);
+      double price = stock.Results[stockName].Price;
       
-      Console.WriteLine("O preço da ação " + assetName + " está em " + price + " usando a api do HG Brasil.");
+      Console.WriteLine("O preço da ação " + stockName + " está em " + price + " usando a api do HG Brasil.");
       
       return price;
     }
