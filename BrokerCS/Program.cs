@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BrokerCS.services;
 using SharpYaml.Serialization;
 
 namespace BrokerCS {
@@ -9,11 +10,14 @@ namespace BrokerCS {
 
       var config = GetConfig();
 
-      var asset = ConfigAssetWatcher(args);
-      var emailClient = ConfigEmailClient(config);
+      var assetName = args[0];
+      var valueToSell = double.Parse(args[1]);
+      var valueToBuy = double.Parse(args[2]);
       var toEmail = config.ToEmail;
+      var asset = ConfigAssetWatcher(args, config);
+      var emailClient = ConfigEmailClient(config);
       
-      var broker = new Broker(asset, emailClient, toEmail);
+      var broker = new Broker(assetName, valueToSell, valueToBuy, toEmail, asset, emailClient);
       broker.Start();
     }
     private static void ValidParams(string[] args) {
@@ -31,21 +35,16 @@ namespace BrokerCS {
 
       return config;
     }
-    private static AssetWatcher ConfigAssetWatcher(string[] args) {
+    private static IAssetClient ConfigAssetWatcher(string[] args, Config config) {
       var assetName = args[0];
-      var valueToSell = double.Parse(args[1]);
-      var valueToBuy = double.Parse(args[2]);
-
-      var asset = new AssetWatcher(assetName, valueToSell, valueToBuy);
+      var asset = new AssetClientByHGBrasil(assetName, config.HGbrasilKey);
+      //var asset = new AssetClientTest(assetName);
       return asset;
     }
-    private static EmailClient ConfigEmailClient(Config config) {
-      EmailClient emailClient = new EmailClient(config.SmtpDomain, config.SmtpPort, config.SmtpUsername, config.SmtpPassword, config.FromEmail);
+    private static IEmailClient ConfigEmailClient(Config config) {
+      var emailClient = new EmailClient(config.SmtpDomain, config.SmtpPort, config.SmtpUsername, config.SmtpPassword, config.FromEmail);
+      //var emailClient = new EmailClientTest(config.FromEmail);
       return emailClient;
-    }
-
-    private static string GetEmail() {
-      return "paulomiranda12@gmail.com";
     }
   }
 }

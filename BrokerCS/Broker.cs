@@ -1,53 +1,70 @@
-using System;
 using System.Threading;
+using BrokerCS.services;
 
 namespace BrokerCS {
   public class Broker {
     private string toEmail;
-    private AssetWatcher assetWatcher;
-    private EmailClient emailClient;
+    private string assetName;
+    private double valueToSell;
+    private double valueToBuy;
+    private IAssetClient assetClient;
+    private IEmailClient emailClient;
+    private int lastEmailType = -1;
 
-    public Broker(AssetWatcher assetWatcher, EmailClient emailClient, string toEmail) {
-      this.assetWatcher = assetWatcher;
+    public Broker(string assetName, double valueToSell, double valueToBuy, string toEmail, IAssetClient assetClient, IEmailClient emailClient) {
+      this.assetName = assetName;
+      this.valueToSell = valueToSell;
+      this.valueToBuy = valueToBuy;
+      this.assetClient = assetClient;
       this.emailClient = emailClient;
       this.toEmail = toEmail;
     }
 
     public void Start() {
-      int lastEmailType = -1;
-
       while (true) {
-        if (assetWatcher.ShouldBuy()) {
-          if (lastEmailType != 0) {
-            SendEmailToBuy();
-            lastEmailType = 0;
-          }
-        }
-        else if (assetWatcher.ShouldSell()) {
-          if (lastEmailType != 1) {
-            SendEmailToSell();
-            lastEmailType = 1;
-          }
-        }
-        else {
-          lastEmailType = -1;
-        }
+        VerifyAsset();
+        Thread.Sleep(10000);
+      }
+    }
+    async void VerifyAsset() {
+      double assetCurrentValue = await assetClient.GetCurrentValue();
 
-        Thread.Sleep(2000);
+      if (ShouldBuy(assetCurrentValue)) {
+        if (lastEmailType != 0) {
+          SendEmailToBuy();
+          lastEmailType = 0;
+        }
+      }
+      else if (ShouldSell(assetCurrentValue)) {
+        if (lastEmailType != 1) {
+          SendEmailToSell();
+          lastEmailType = 1;
+        }
+      }
+      else {
+        lastEmailType = -1;
       }
     }
 
+    private bool ShouldBuy(double assetCurrentValue) {
+      return assetCurrentValue < valueToBuy;
+    }
+
+    private bool ShouldSell(double assetCurrentValue) {
+      return assetCurrentValue > valueToSell;
+    }
+
     void SendEmailToBuy() {
-      string title = "Compre ações do ativo " + assetWatcher.assetName;
-      string text = "O valor da ação " + assetWatcher.assetName + " ficou abaixo de " + assetWatcher.valueToBuy +
+      string title = "Compre ações do ativo " + assetName;
+      string text = "O valor da ação " + assetName + " ficou abaixo de " + valueToBuy +
                     ". Aproveite essa oportunidade para comprar!";
 
       emailClient.SendEmail(title, text, toEmail);
     }
 
     void SendEmailToSell() {
-      string title = "Venda ações do ativo " + assetWatcher.assetName;
-      string text = "O valor da ação " + assetWatcher.assetName + " ficou acima de " + assetWatcher.valueToSell +
+      string title = "Venda ações do ativo " + assetName;
+      string text = "O valor da ação " + assetName + " ficou acima de " + valueToSell +
                     ". Aproveite essa oportunidade para vender!";
 
       emailClient.SendEmail(title, text, toEmail);
